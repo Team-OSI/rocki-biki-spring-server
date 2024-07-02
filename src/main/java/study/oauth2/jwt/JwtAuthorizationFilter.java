@@ -1,46 +1,42 @@
 package study.oauth2.jwt;
 
+import java.io.IOException;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
+    private final TokenProvider tokenProvider;
 
-@RequiredArgsConstructor
-@Component
-public class JwtAuthorizationFilter extends OncePerRequestFilter {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, TokenProvider tokenProvider) {
+        super(authenticationManager);
+        this.tokenProvider = tokenProvider;
+    }
 
-	private static final String AUTHORIZATION_HEADER = "Authorization";
-	private static final String BEARER_PREFIX = "Bearer ";
-	private final TokenProvider tokenProvider;
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String header = request.getHeader("Authorization");
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-		String token = resolveToken(request);
+        String token = header.substring(7);
+        if (tokenProvider.validateToken(token)) {
+            Authentication authentication = tokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
 
-		if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-			Authentication authentication = tokenProvider.getAuthentication(token);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-		}
-
-		filterChain.doFilter(request, response);
-	}
-
-	private String resolveToken(HttpServletRequest request) {
-		String token = request.getHeader(AUTHORIZATION_HEADER);
-
-		if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
-			return token.substring(BEARER_PREFIX.length());
-		}
-
-		return null;
-	}
+        chain.doFilter(request, response);
+    }
 }
