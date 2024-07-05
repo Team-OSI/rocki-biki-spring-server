@@ -30,7 +30,13 @@ jobs:
       # Github secrets로부터 데이터를 받아서, 워크 플로우에 파일을 생성
       - name: Make application.properties
         run: |
-          cd ./src/main/resources
+          ls
+          cd ./src
+          ls
+          cd ./main
+          ls
+          cd ./resources
+          ls
           touch ./application.properties
           echo "${{ secrets.PROPERTIES }}" > ./application.properties
         shell: bash
