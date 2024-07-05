@@ -31,12 +31,19 @@ jobs:
       - name: Make application.yml
         run: |
           cd ./src/main/resources
+          echo "Current directory:"
           pwd # 현재 디렉토리 확인
+          echo "Directory contents:"
           ls # 디렉토리 내용 확인
           touch application.yml
+          echo "Creating application.yml with secrets:"
           echo "${{ secrets.PROPERTIES }}" > application.yml
+          echo "Content of application.yml:"
           cat application.yml # 파일 내용 확인
         shell: bash
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
+          JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
 
       # gradle을 통해 소스를 빌드.
       - name: Build with Gradle
