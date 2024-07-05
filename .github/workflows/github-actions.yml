@@ -31,8 +31,11 @@ jobs:
       - name: Make application.yml
         run: |
           cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.PROPERTIES }}" > ./application.yml
+          pwd # 현재 디렉토리 확인
+          ls # 디렉토리 내용 확인
+          touch application.yml
+          echo "${{ secrets.PROPERTIES }}" > application.yml
+          cat application.yml # 파일 내용 확인
         shell: bash
 
       # gradle을 통해 소스를 빌드.
