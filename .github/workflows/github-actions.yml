@@ -33,7 +33,7 @@ jobs:
           cd ./src/main/resources
           touch ./application.properties
           echo "${{ secrets.PROPERTIES }}" > ./application.properties
-        shell: bash	 
+        shell: bash
 
 
       # gradle을 통해 소스를 빌드.
