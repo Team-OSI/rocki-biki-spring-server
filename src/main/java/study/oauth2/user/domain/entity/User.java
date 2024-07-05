@@ -45,6 +45,10 @@ public class User {
 	@JoinColumn(name = "profile_id")
 	private Profile profile;
 
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "social_id")
+	private Social social;
+
 	public static User create(String email, Auth auth, Profile profile, OAuth2Provider provider) {
 		if (provider == OAuth2Provider.LOCAL) {
 			return User.builder()

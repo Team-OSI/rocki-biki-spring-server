@@ -72,11 +72,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         if ("login".equalsIgnoreCase(mode)) {
-            userService.registerSocialUser(
-                principal.getUserInfo().getEmail(),
-                principal.getUserInfo().getNickname(),
-                principal.getUserInfo().getProvider()
-            );
+            if (! userService.existsByEmail(principal.getUserInfo().getEmail())) {
+                userService.registerSocialUser(
+                    principal.getUserInfo().getEmail(),
+                    principal.getUserInfo().getNickname(),
+                    principal.getUserInfo().getProvider()
+                );
+            }
             // TODO: 액세스 토큰, 리프레시 토큰 발급
             // TODO: 리프레시 토큰 DB 저장
             log.info("email={}, name={}, nickname={}, accessToken={}", principal.getUserInfo().getEmail(),
