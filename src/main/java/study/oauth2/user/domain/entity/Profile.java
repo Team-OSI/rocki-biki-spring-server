@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "profile", uniqueConstraints = {@UniqueConstraint(columnNames = "user_id")})
 public class Profile {
 
 	@Id
@@ -23,12 +26,9 @@ public class Profile {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "user_id", unique = true, nullable = false)
+	private Long userId;
+
 	private String nickname;
 	private String profileImage;
-
-	// 추후 nickname와 profileImage를 추가할 수 있도록 Profile 객체를 생성하는 메서드를 추가
-	public static Profile create() {
-		return Profile.builder()
-			.build();
-	}
 }

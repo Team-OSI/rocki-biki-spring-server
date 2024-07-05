@@ -12,17 +12,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import study.oauth2.oauth2.user.OAuth2Provider;
 
 @Entity
 @Builder
 @Getter
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "user_id")})
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
@@ -41,6 +43,7 @@ public class User {
 	@JoinColumn(name = "auth_id")
 	private Auth auth;
 
+	@Setter
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "profile_id")
 	private Profile profile;
@@ -49,19 +52,17 @@ public class User {
 	@JoinColumn(name = "social_id")
 	private Social social;
 
-	public static User create(String email, Auth auth, Profile profile, OAuth2Provider provider) {
+	public static User create(String email, Auth auth, OAuth2Provider provider) {
 		if (provider == OAuth2Provider.LOCAL) {
 			return User.builder()
 				.email(email)
 				.provider(provider)
 				.auth(auth)
-				.profile(profile)
 				.build();
 		} else {
 			return User.builder()
 				.email(email)
 				.provider(provider)
-				.profile(profile)
 				.build();
 		}
 	}

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.oauth2.user.OAuth2Provider;
+import study.oauth2.user.domain.dto.ProfileDto;
 import study.oauth2.user.domain.entity.Auth;
 import study.oauth2.user.domain.entity.Profile;
 import study.oauth2.user.domain.entity.User;
@@ -37,10 +38,7 @@ public class UserService {
 		Auth auth = Auth.create(passwordEncoder.encode(password));
 		auth = authRepository.save(auth);
 
-		Profile profile = Profile.create();
-		profile = profileRepository.save(profile);
-
-		User user = User.create(email, auth, profile, OAuth2Provider.LOCAL);
+		User user = User.create(email, auth, OAuth2Provider.LOCAL);
 		return userRepository.save(user);
 	}
 
@@ -51,12 +49,19 @@ public class UserService {
 			throw new RuntimeException("Email already exists");
 		}
 
-		Profile profile = Profile.create();
-		profile = profileRepository.save(profile);
-		log.info("provider: {}", provider);
+		User user = User.create(email, null, provider);
 
-		User user = User.create(email, null, profile, provider);
 		return userRepository.save(user);
+	}
+
+	// OneToOne 조인 시 N + 1 문제를 해결하기 위해 양방향 매핑이 아닌 Id로 매핑
+	@Transactional
+	public void saveUserProfile(String email, ProfileDto profileDto) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		Profile profile = ProfileDto.toEntity(user.getId(), profileDto);
+		profileRepository.save(profile);
+		user.setProfile(profile);
 	}
 
 	public Boolean existsByEmail(String email) throws UsernameNotFoundException {

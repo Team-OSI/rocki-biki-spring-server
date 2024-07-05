@@ -20,7 +20,7 @@ public class AuthController {
 
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
-		User user = userService.registerUser(
+		userService.registerUser(
 			signUpRequest.getEmail(),
 			signUpRequest.getPassword()
 		);
