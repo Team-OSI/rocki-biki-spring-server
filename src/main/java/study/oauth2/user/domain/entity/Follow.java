@@ -39,4 +39,11 @@ public class Follow {
 		Long fromUser;
 	}
 
+	public static Follow create(Long toUser, Long fromUser) {
+		return Follow.builder()
+			.toUser(toUser)
+			.fromUser(fromUser)
+			.build();
+	}
+
 }

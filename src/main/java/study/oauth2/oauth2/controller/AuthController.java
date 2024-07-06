@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import study.oauth2.dto.SignUpRequest;
-import study.oauth2.user.domain.entity.User;
 import study.oauth2.user.service.UserService;
 
 @RestController
@@ -20,10 +19,7 @@ public class AuthController {
 
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
-		User user = userService.registerUser(
-			signUpRequest.getEmail(),
-			signUpRequest.getPassword()
-		);
+		userService.registerUser(signUpRequest);
 		return ResponseEntity.ok("User registered successfully");
 	}
 }
