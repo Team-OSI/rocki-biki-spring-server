@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import study.oauth2.user.domain.dto.FollowingRequestDto;
 import study.oauth2.user.domain.dto.ProfileDto;
 import study.oauth2.user.service.UserService;
 
@@ -33,6 +34,13 @@ public class UserController {
         @RequestBody ProfileDto profileDto
     ) {
         userService.saveUserProfile(userDetails.getUsername(), profileDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/users/follow")
+    public ResponseEntity<?> followingUser(@RequestBody FollowingRequestDto followingRequestDto) {
+        log.info("followingRequestDto: {}", followingRequestDto);
+        userService.followingUser(followingRequestDto);
         return ResponseEntity.ok().build();
     }
 

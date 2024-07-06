@@ -75,7 +75,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             if (! userService.existsByEmail(principal.getUserInfo().getEmail())) {
                 userService.registerSocialUser(
                     principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getNickname(),
                     principal.getUserInfo().getProvider()
                 );
             }

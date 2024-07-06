@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FollowingRequestDto {
 
-	private Long toUser;
-	private Long fromUser;
+	private String toUser;
+	private String fromUser;
 
 }
