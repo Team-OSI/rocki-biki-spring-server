@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import study.oauth2.config.BaseEntity;
-import study.oauth2.oauth2.user.OAuth2Provider;
+import study.oauth2.auth.oauth2.user.OAuth2Provider;
 
 @Entity
 @Builder

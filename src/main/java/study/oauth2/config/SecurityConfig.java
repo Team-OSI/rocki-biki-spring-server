@@ -10,17 +10,19 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import lombok.RequiredArgsConstructor;
-import study.oauth2.auth.jwt.JwtAuthenticationFilter;
-import study.oauth2.auth.jwt.JwtAuthorizationFilter;
-import study.oauth2.auth.jwt.TokenProvider;
-import study.oauth2.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-import study.oauth2.oauth2.handler.OAuth2AuthenticationFailureHandler;
-import study.oauth2.oauth2.handler.OAuth2AuthenticationSuccessHandler;
-import study.oauth2.oauth2.service.CustomOAuth2UserService;
+import study.oauth2.auth.local.filter.CustomAuthenticationFilter;
+import study.oauth2.auth.local.filter.CustomAuthorizationFilter;
+import study.oauth2.auth.local.jwt.TokenProvider;
+import study.oauth2.auth.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import study.oauth2.auth.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import study.oauth2.auth.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import study.oauth2.auth.oauth2.service.CustomOAuth2UserService;
 
 @RequiredArgsConstructor
 @Configuration
@@ -42,8 +44,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, tokenProvider);
-        JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(authenticationManager, tokenProvider);
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager, tokenProvider);
+        CustomAuthorizationFilter customAuthorizationFilter = new CustomAuthorizationFilter(authenticationManager, tokenProvider);
 
         http
             .csrf(AbstractHttpConfigurer::disable)
@@ -62,8 +64,8 @@ public class SecurityConfig {
                     .successHandler(oAuth2AuthenticationSuccessHandler)
                     .failureHandler(oAuth2AuthenticationFailureHandler)
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
