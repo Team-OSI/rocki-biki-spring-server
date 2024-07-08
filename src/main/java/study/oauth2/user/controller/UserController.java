@@ -3,12 +3,14 @@ package study.oauth2.user.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.user.domain.dto.FollowRequestDto;
@@ -33,7 +35,7 @@ public class UserController {
     @PostMapping("/users/profile")
     public ResponseEntity<?> setUserProfile(
         @AuthenticationPrincipal UserDetails userDetails,
-        @RequestBody ProfileDto profileDto
+        @Valid @RequestBody ProfileDto profileDto
     ) {
         profileService.saveUserProfile(userDetails.getUsername(), profileDto);
         return ResponseEntity.ok().build();
@@ -42,18 +44,25 @@ public class UserController {
     @PostMapping("/users/follow/add")
     public ResponseEntity<?> followingUser(
         @AuthenticationPrincipal UserDetails userDetails,
-        @RequestBody FollowRequestDto followingRequestDto
+        @Valid @RequestBody FollowRequestDto followingRequestDto
     ) {
         followService.followingUser(userDetails.getUsername(), followingRequestDto.getToUser());
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/users/follow/delete")
+    @DeleteMapping("/users/follow/delete")
     public ResponseEntity<?> unFollowingUser(
         @AuthenticationPrincipal UserDetails userDetails,
-        @RequestBody FollowRequestDto followingRequestDto
+        @Valid @RequestBody FollowRequestDto followingRequestDto
     ) {
         followService.deleteFollower(userDetails.getUsername(), followingRequestDto.getToUser());
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/users/follow/count")
+    public ResponseEntity<?> followCount (@AuthenticationPrincipal UserDetails userDetails) {
+        followService.followCount(userDetails.getUsername());
+        return ResponseEntity.ok().build();
+    }
+
 }

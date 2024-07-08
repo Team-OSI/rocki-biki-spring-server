@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.auth.dto.SignRequest;
+import study.oauth2.exception.EmailAlreadyExistsException;
 import study.oauth2.oauth2.user.OAuth2Provider;
 import study.oauth2.user.domain.entity.Auth;
 import study.oauth2.user.domain.entity.User;
@@ -37,7 +38,7 @@ public class UserService {
 	@Transactional
 	public void registerUser(String email, String password) {
 		if (userRepository.existsByEmail(email)) {
-			throw new RuntimeException("Email already exists");
+			throw new EmailAlreadyExistsException("Email already exists");
 		}
 
 		Auth auth = Auth.create(passwordEncoder.encode(password));

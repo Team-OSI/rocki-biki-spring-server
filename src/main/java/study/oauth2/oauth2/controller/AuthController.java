@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import study.oauth2.auth.dto.SignRequest;
 import study.oauth2.user.service.UserService;
@@ -18,13 +19,13 @@ public class AuthController {
 	private final UserService userService;
 
 	@PostMapping("/register")
-	public ResponseEntity<?> registerUser(@RequestBody SignRequest signRequest) {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody SignRequest signRequest) {
 		userService.registerUser(signRequest.getEmail(), signRequest.getPassword());
 		return ResponseEntity.ok("User registered successfully");
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody SignRequest signRequest) {
+	public ResponseEntity<?> login(@Valid @RequestBody SignRequest signRequest) {
 		userService.login(signRequest);
 		return ResponseEntity.ok("User login successfully");
 	}
