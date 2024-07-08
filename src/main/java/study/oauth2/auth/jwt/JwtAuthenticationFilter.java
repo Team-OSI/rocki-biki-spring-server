@@ -14,7 +14,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import study.oauth2.auth.dto.LoginRequest;
+import study.oauth2.auth.dto.SignRequest;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private final AuthenticationManager authenticationManager;
@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 		try {
-			LoginRequest loginRequest = new ObjectMapper().readValue(request.getInputStream(), LoginRequest.class);
+			SignRequest loginRequest = new ObjectMapper().readValue(request.getInputStream(), SignRequest.class);
 			Authentication authentication = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 			return authenticationManager.authenticate(authentication);
 		} catch (IOException e) {
