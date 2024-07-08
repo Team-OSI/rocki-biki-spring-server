@@ -1,4 +1,4 @@
-package study.oauth2.jwt;
+package study.oauth2.auth.jwt;
 
 import java.security.Key;
 import java.util.Collections;
@@ -23,6 +23,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import study.oauth2.oauth2.service.CustomUserDetailsService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class TokenProvider {
     @Value("${jwt.secret}")
     private String secret;
     private Key key;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @PostConstruct
     public void init() {

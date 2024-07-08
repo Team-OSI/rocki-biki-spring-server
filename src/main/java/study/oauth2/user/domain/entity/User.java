@@ -19,6 +19,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import study.oauth2.config.BaseEntity;
 import study.oauth2.oauth2.user.OAuth2Provider;
 
 @Entity
@@ -27,7 +28,7 @@ import study.oauth2.oauth2.user.OAuth2Provider;
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "user_id")})
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseEntity {
 
 	@Id
 	@Column(name = "user_id")
@@ -38,6 +39,10 @@ public class User {
 	@Column(name = "provider", nullable = false)
 	@Enumerated(value = STRING)
 	private OAuth2Provider provider;
+
+	@Column(name = "status", nullable = false)
+	@Enumerated(value = STRING)
+	private MemberStatus status;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "auth_id")
@@ -57,12 +62,14 @@ public class User {
 			return User.builder()
 				.email(email)
 				.provider(provider)
+				.status(MemberStatus.ACTIVE)
 				.auth(auth)
 				.build();
 		} else {
 			return User.builder()
 				.email(email)
 				.provider(provider)
+				.status(MemberStatus.ACTIVE)
 				.build();
 		}
 	}

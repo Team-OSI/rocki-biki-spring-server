@@ -11,6 +11,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import study.oauth2.config.BaseEntity;
 
 @Entity
 @Table(
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 )
 @IdClass(Follow.PK.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Follow {
+public class Follow extends BaseEntity {
 
 	@Id
 	@Column(name = "to_user", insertable = false, updatable = false)
@@ -34,6 +35,7 @@ public class Follow {
 		this.fromUser = fromUser;
 	}
 
+	@NoArgsConstructor(access = AccessLevel.PROTECTED)
 	public static class PK implements Serializable {
 		Long toUser;
 		Long fromUser;

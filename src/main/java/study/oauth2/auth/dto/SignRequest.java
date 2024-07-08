@@ -1,4 +1,4 @@
-package study.oauth2.dto;
+package study.oauth2.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignUpRequest {
+public class SignRequest {
 	private String email;
 	private String password;
-	private String nickname;
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import study.oauth2.dto.SignUpRequest;
+import study.oauth2.auth.dto.SignRequest;
 import study.oauth2.user.service.UserService;
 
 @RestController
@@ -18,8 +18,14 @@ public class AuthController {
 	private final UserService userService;
 
 	@PostMapping("/register")
-	public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
-		userService.registerUser(signUpRequest);
+	public ResponseEntity<?> registerUser(@RequestBody SignRequest signRequest) {
+		userService.registerUser(signRequest.getEmail(), signRequest.getPassword());
 		return ResponseEntity.ok("User registered successfully");
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody SignRequest signRequest) {
+		userService.login(signRequest);
+		return ResponseEntity.ok("User login successfully");
 	}
 }
