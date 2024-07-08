@@ -6,12 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import study.oauth2.user.domain.FollowCountResponseDto;
-import study.oauth2.user.domain.dto.FollowRequestDto;
+import study.oauth2.user.domain.dto.FollowCountResponseDto;
 import study.oauth2.user.domain.entity.Follow;
 import study.oauth2.user.domain.entity.User;
 import study.oauth2.user.repository.FollowRepository;
-import study.oauth2.user.repository.ProfileRepository;
 import study.oauth2.user.repository.UserRepository;
 
 @Slf4j
@@ -45,6 +43,8 @@ public class FollowService {
 	public FollowCountResponseDto followCount(String email) {
 		User user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-		return null;
+		Long followingCount = followRepository.countByFromUser(user.getId());
+		Long followerCount = followRepository.countByToUser(user.getId());
+		return FollowCountResponseDto.create(followingCount, followerCount);
 	}
 }
