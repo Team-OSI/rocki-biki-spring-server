@@ -13,13 +13,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import study.oauth2.config.BaseEntity;
 
 @Entity
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Social {
+public class Social extends BaseEntity {
 
 	@Id
 	@Column(name = "social_id")

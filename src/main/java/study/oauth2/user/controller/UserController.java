@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import study.oauth2.user.domain.dto.FollowingRequestDto;
+import study.oauth2.user.domain.dto.FollowRequestDto;
 import study.oauth2.user.domain.dto.ProfileDto;
-import study.oauth2.user.service.UserService;
+import study.oauth2.user.service.FollowService;
+import study.oauth2.user.service.ProfileService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,11 +22,12 @@ import study.oauth2.user.service.UserService;
 @RestController
 public class UserController {
 
-    private final UserService userService;
+    private final ProfileService profileService;
+    private final FollowService followService;
 
     @GetMapping("/users")
-    public String getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        return userDetails.getUsername();
+    public String getUserInfo(@AuthenticationPrincipal UserDetails UserDetails) {
+        return UserDetails.getUsername();
     }
 
     @PostMapping("/users/profile")
@@ -33,15 +35,25 @@ public class UserController {
         @AuthenticationPrincipal UserDetails userDetails,
         @RequestBody ProfileDto profileDto
     ) {
-        userService.saveUserProfile(userDetails.getUsername(), profileDto);
+        profileService.saveUserProfile(userDetails.getUsername(), profileDto);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/users/follow")
-    public ResponseEntity<?> followingUser(@RequestBody FollowingRequestDto followingRequestDto) {
-        log.info("followingRequestDto: {}", followingRequestDto);
-        userService.followingUser(followingRequestDto);
+    @PostMapping("/users/follow/add")
+    public ResponseEntity<?> followingUser(
+        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestBody FollowRequestDto followingRequestDto
+    ) {
+        followService.followingUser(userDetails.getUsername(), followingRequestDto.getToUser());
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/users/follow/delete")
+    public ResponseEntity<?> unFollowingUser(
+        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestBody FollowRequestDto followingRequestDto
+    ) {
+        followService.deleteFollower(userDetails.getUsername(), followingRequestDto.getToUser());
+        return ResponseEntity.ok().build();
+    }
 }

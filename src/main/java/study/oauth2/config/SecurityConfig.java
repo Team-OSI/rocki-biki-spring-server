@@ -13,9 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
-import study.oauth2.jwt.JwtAuthenticationFilter;
-import study.oauth2.jwt.JwtAuthorizationFilter;
-import study.oauth2.jwt.TokenProvider;
+import study.oauth2.auth.jwt.JwtAuthenticationFilter;
+import study.oauth2.auth.jwt.JwtAuthorizationFilter;
+import study.oauth2.auth.jwt.TokenProvider;
 import study.oauth2.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import study.oauth2.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import study.oauth2.oauth2.handler.OAuth2AuthenticationSuccessHandler;

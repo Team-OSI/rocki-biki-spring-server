@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -16,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import study.oauth2.jwt.TokenProvider;
+import study.oauth2.auth.jwt.TokenProvider;
 import study.oauth2.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import study.oauth2.oauth2.service.OAuth2UserPrincipal;
 import study.oauth2.oauth2.user.OAuth2Provider;
@@ -72,12 +71,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         if ("login".equalsIgnoreCase(mode)) {
-            if (! userService.existsByEmail(principal.getUserInfo().getEmail())) {
-                userService.registerSocialUser(
-                    principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getProvider()
-                );
-            }
+            userService.findOrCreateUser(principal.getUserInfo().getEmail(), principal.getUserInfo().getProvider());
             // TODO: 액세스 토큰, 리프레시 토큰 발급
             // TODO: 리프레시 토큰 DB 저장
             log.info("email={}, name={}, nickname={}, accessToken={}", principal.getUserInfo().getEmail(),

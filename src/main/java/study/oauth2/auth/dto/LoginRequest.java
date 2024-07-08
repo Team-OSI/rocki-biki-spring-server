@@ -1,4 +1,4 @@
-package study.oauth2.user.domain.dto;
+package study.oauth2.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class FollowingRequestDto {
-
-	private String toUser;
-	private String fromUser;
-
+@NoArgsConstructor
+public class LoginRequest {
+	private String email;
+	private String password;
 }

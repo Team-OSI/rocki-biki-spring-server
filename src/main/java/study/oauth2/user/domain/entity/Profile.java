@@ -31,4 +31,12 @@ public class Profile {
 
 	private String nickname;
 	private String profileImage;
+
+	public static Profile create(Long userId, String nickname, String profileImage) {
+		return Profile.builder()
+			.userId(userId)
+			.nickname(nickname)
+			.profileImage(profileImage)
+			.build();
+	}
 }
