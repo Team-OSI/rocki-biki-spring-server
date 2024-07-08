@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import study.oauth2.user.domain.dto.FollowCountResponseDto;
 import study.oauth2.user.domain.dto.FollowRequestDto;
 import study.oauth2.user.domain.dto.ProfileDto;
 import study.oauth2.user.service.FollowService;
@@ -61,8 +62,8 @@ public class UserController {
 
     @GetMapping("/users/follow/count")
     public ResponseEntity<?> followCount (@AuthenticationPrincipal UserDetails userDetails) {
-        followService.followCount(userDetails.getUsername());
-        return ResponseEntity.ok().build();
+        FollowCountResponseDto followCountResponseDto = followService.followCount(userDetails.getUsername());
+        return ResponseEntity.ok(followCountResponseDto);
     }
 
 }

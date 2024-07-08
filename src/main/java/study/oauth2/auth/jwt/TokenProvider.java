@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -21,6 +22,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.oauth2.service.CustomUserDetailsService;
@@ -40,6 +43,19 @@ public class TokenProvider {
     public void init() {
         byte[] key = Decoders.BASE64URL.decode(secret);
         this.key = Keys.hmacShaKeyFor(key);
+    }
+
+    public boolean validateToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("JWT_TOKEN".equals(cookie.getName())) {
+                    String token = cookie.getValue();
+                    return validateToken(token);
+                }
+            }
+        }
+        return false;
     }
 
     public boolean validateToken(String token) {
@@ -66,17 +82,37 @@ public class TokenProvider {
         return false;
     }
 
-    public String createToken(Authentication authentication) {
-
+    public ResponseCookie createToken(Authentication authentication) {
         Date date = new Date();
         Date expiryDate = new Date(date.getTime() + ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS);
 
-        return Jwts.builder()
-                .setSubject(authentication.getName())
-                .setIssuedAt(date)
-                .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
+        String token = Jwts.builder()
+            .setSubject(authentication.getName())
+            .setIssuedAt(date)
+            .setExpiration(expiryDate)
+            .signWith(key, SignatureAlgorithm.HS512)
+            .compact();
+
+        return ResponseCookie.from("JWT_TOKEN", token)
+            .httpOnly(true)
+            .secure(false) // HTTPS를 사용하는 경우에만 true로 설정
+            .path("/")
+            .maxAge(ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS / 1000) // 초 단위로 변환
+            .sameSite("Strict") // 또는 "Lax"
+            .build();
+    }
+
+    public Authentication getAuthentication(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("JWT_TOKEN".equals(cookie.getName())) {
+                    String token = cookie.getValue();
+                    return getAuthentication(token);
+                }
+            }
+        }
+        return null;
     }
 
     public Authentication getAuthentication(String token) {

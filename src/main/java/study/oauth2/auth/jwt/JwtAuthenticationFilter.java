@@ -2,6 +2,7 @@ package study.oauth2.auth.jwt;
 
 import java.io.IOException;
 
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,7 +41,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException,
 		ServletException {
-		String token = tokenProvider.createToken(authResult);
-		response.addHeader("Authorization", "Bearer " + token);
+		ResponseCookie jwtCookie = tokenProvider.createToken(authResult);
+		response.addHeader("Set-Cookie", jwtCookie.toString());
+
+		// JSON 응답 추가
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write("{\"message\":\"Login successful\"}");
+	}
+
+	@Override
+	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write("{\"error\":\"Authentication failed\"}");
 	}
 }

@@ -1,10 +1,12 @@
-package study.oauth2.user.domain;
+package study.oauth2.user.domain.dto;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 public class FollowCountResponseDto {
