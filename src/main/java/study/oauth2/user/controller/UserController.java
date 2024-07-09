@@ -66,10 +66,9 @@ public class UserController {
         return ResponseEntity.ok(followCountResponseDto);
     }
 
-    @GetMapping("/users/follow/getFollowers")
-    public ResponseEntity<?> getFollow (@AuthenticationPrincipal UserDetails userDetails) {
-        FollowCountResponseDto followCountResponseDto = followService.followCount(userDetails.getUsername());
-        return ResponseEntity.ok(followCountResponseDto);
+    @GetMapping("/users/follow/getFollowList")
+    public ResponseEntity<?> getFollowList (@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(followService.followList(userDetails.getUsername()));
     }
 
 }

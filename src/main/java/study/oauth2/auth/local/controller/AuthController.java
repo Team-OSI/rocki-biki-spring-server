@@ -1,4 +1,4 @@
-package study.oauth2.auth.oauth2.controller;
+package study.oauth2.auth.local.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
