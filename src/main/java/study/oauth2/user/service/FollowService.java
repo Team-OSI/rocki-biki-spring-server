@@ -1,5 +1,7 @@
 package study.oauth2.user.service;
 
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.user.domain.dto.FollowCountResponseDto;
+import study.oauth2.user.domain.dto.FollowListResponseDto;
+import study.oauth2.user.domain.dto.FollowSimpleDto;
 import study.oauth2.user.domain.entity.Follow;
 import study.oauth2.user.domain.entity.User;
 import study.oauth2.user.repository.FollowRepository;
@@ -47,4 +51,24 @@ public class FollowService {
 		Long followerCount = followRepository.countByToUser(user.getId());
 		return FollowCountResponseDto.create(followingCount, followerCount);
 	}
+
+	public FollowListResponseDto followList(String email) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		log.info("user: {}", user.toString());
+
+		List<FollowSimpleDto> allFollowing = followRepository.findAllFollowing(user.getId());
+		List<FollowSimpleDto> allFollower = followRepository.findAllFollower(user.getId());
+		for (FollowSimpleDto followSimpleDto : allFollowing) {
+			log.info("following: {}", followSimpleDto.toString());
+		}
+		for (FollowSimpleDto followSimpleDto : allFollower) {
+			log.info("follower: {}", followSimpleDto.toString());
+		}
+		return FollowListResponseDto.of(
+			allFollowing,
+			allFollower
+		);
+	}
+
 }
