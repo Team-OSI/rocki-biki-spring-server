@@ -57,17 +57,9 @@ public class FollowService {
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 		log.info("user: {}", user.toString());
 
-		List<FollowSimpleDto> allFollowing = followRepository.findAllFollowing(user.getId());
-		List<FollowSimpleDto> allFollower = followRepository.findAllFollower(user.getId());
-		for (FollowSimpleDto followSimpleDto : allFollowing) {
-			log.info("following: {}", followSimpleDto.toString());
-		}
-		for (FollowSimpleDto followSimpleDto : allFollower) {
-			log.info("follower: {}", followSimpleDto.toString());
-		}
 		return FollowListResponseDto.of(
-			allFollowing,
-			allFollower
+			followRepository.findAllFollowing(user.getId()),
+			followRepository.findAllFollower(user.getId())
 		);
 	}
 
