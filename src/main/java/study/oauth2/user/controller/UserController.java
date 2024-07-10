@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.user.domain.dto.FollowCountResponseDto;
@@ -36,9 +39,11 @@ public class UserController {
     @PostMapping("/users/profile")
     public ResponseEntity<?> setUserProfile(
         @AuthenticationPrincipal UserDetails userDetails,
-        @Valid @RequestBody ProfileDto profileDto
+        @RequestParam @Valid @NotNull(message = "Nickname cannot be null") String nickname,
+        @RequestParam("image") MultipartFile image
     ) {
-        profileService.saveUserProfile(userDetails.getUsername(), profileDto);
+
+        profileService.saveUserProfile(userDetails.getUsername(), nickname, image);
         return ResponseEntity.ok().build();
     }
 

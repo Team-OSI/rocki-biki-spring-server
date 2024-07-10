@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import study.oauth2.exception.Error.EmailAlreadyExistsException;
+import study.oauth2.exception.Error.S3Exception;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -37,6 +40,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(JsonProcessingException.class)
 	public ResponseEntity<String> handleJsonProcessingException(JsonProcessingException ex) {
 		return handleException(ex, HttpStatus.CONFLICT);
+	}
+
+	@ExceptionHandler(S3Exception.class)
+	public ResponseEntity<String> handleS3Exception(S3Exception ex) {
+		return handleException(ex, HttpStatus.BAD_REQUEST);
 	}
 
 	private ResponseEntity<String> handleException(BindingResult bindingResult) {

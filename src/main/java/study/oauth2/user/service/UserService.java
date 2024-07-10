@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.auth.local.dto.SignRequest;
-import study.oauth2.exception.EmailAlreadyExistsException;
+import study.oauth2.exception.Error.EmailAlreadyExistsException;
 import study.oauth2.auth.oauth2.user.OAuth2Provider;
 import study.oauth2.user.domain.entity.Auth;
 import study.oauth2.user.domain.entity.User;

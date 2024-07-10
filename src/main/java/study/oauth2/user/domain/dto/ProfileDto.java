@@ -17,15 +17,14 @@ import study.oauth2.user.domain.entity.Profile;
 public class ProfileDto {
 
 	@NotNull(message = "Nickname cannot be null")
-	@Email(message = "Nickname should be valid")
 	private String nickname;
 	private String profileImage;
 
-	public static Profile toEntity(Long userId, ProfileDto profileDto) {
+	public static Profile toEntity(Long userId, String nickname, String profileImage) {
 		return Profile.builder()
 			.userId(userId)
-			.nickname(profileDto.getNickname())
-			.profileImage(profileDto.getProfileImage())
+			.nickname(nickname)
+			.profileImage(profileImage)
 			.build();
 	}
 }
