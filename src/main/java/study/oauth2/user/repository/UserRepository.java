@@ -11,9 +11,4 @@ import study.oauth2.user.repository.jpa.UserJpaRepository;
 
 @Repository
 public interface UserRepository extends UserJpaRepository {
-
-	Optional<User> findByEmail(String email);
-
-	@Query("SELECT u FROM User u LEFT JOIN FETCH u.auth WHERE u.email = :email")
-	Optional<User> findByEmailWithAuth(@Param("email") String email);
 }

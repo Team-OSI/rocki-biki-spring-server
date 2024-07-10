@@ -13,33 +13,38 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		return handleException(ex.getBindingResult(), HttpStatus.BAD_REQUEST);
+		return handleException(ex.getBindingResult());
 	}
 
 	@ExceptionHandler(EmailAlreadyExistsException.class)
-	@ResponseStatus(HttpStatus.CONFLICT)
 	public ResponseEntity<String> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
 		return handleException(ex, HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(UsernameNotFoundException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ResponseEntity<String> handleUsernameNotFoundException(UsernameNotFoundException ex) {
 		return handleException(ex, HttpStatus.NOT_FOUND);
 	}
 
-	private ResponseEntity<String> handleException(BindingResult bindingResult, HttpStatus status) {
+	@ExceptionHandler(JsonProcessingException.class)
+	public ResponseEntity<String> handleJsonProcessingException(JsonProcessingException ex) {
+		return handleException(ex, HttpStatus.CONFLICT);
+	}
+
+	private ResponseEntity<String> handleException(BindingResult bindingResult) {
 		List<String> errorMessages = bindingResult.getFieldErrors().stream()
 			.map(FieldError::getDefaultMessage)
 			.collect(Collectors.toList());
 		String errorMessage = String.join(", ", errorMessages);
-		return ResponseEntity.status(status).body(errorMessage);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 	}
 
 	private ResponseEntity<String> handleException(Exception ex, HttpStatus status) {
