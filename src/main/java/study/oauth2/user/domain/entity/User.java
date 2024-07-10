@@ -2,6 +2,9 @@ package study.oauth2.user.domain.entity;
 
 import static jakarta.persistence.EnumType.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -10,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -22,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 import study.oauth2.config.BaseEntity;
 import study.oauth2.auth.oauth2.user.OAuth2Provider;
+import study.oauth2.game.domain.entity.GameResult;
 
 @ToString
 @Entity
@@ -55,9 +60,8 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "profile_id")
 	private Profile profile;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "social_id")
-	private Social social;
+	@OneToMany(mappedBy = "user")
+	private List<GameResult> gameResults = new ArrayList<>();
 
 	public static User create(String email, Auth auth, OAuth2Provider provider) {
 		if (provider == OAuth2Provider.LOCAL) {
