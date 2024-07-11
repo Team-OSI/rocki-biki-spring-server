@@ -39,4 +39,9 @@ public class Profile {
 			.profileImage(profileImage)
 			.build();
 	}
+
+	public void update(String nickname, String profileImage) {
+		this.nickname = nickname;
+		this.profileImage = profileImage;
+	}
 }

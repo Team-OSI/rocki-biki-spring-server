@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.user.domain.dto.FollowCountResponseDto;
 import study.oauth2.user.domain.dto.FollowRequestDto;
-import study.oauth2.user.domain.dto.ProfileDto;
+import study.oauth2.user.domain.dto.ProfileResponseDto;
 import study.oauth2.user.service.FollowService;
 import study.oauth2.user.service.ProfileService;
 
@@ -36,14 +36,29 @@ public class UserController {
         return UserDetails.getUsername();
     }
 
-    @PostMapping("/users/profile")
+    @PostMapping("/users/profile/set")
     public ResponseEntity<?> setUserProfile(
         @AuthenticationPrincipal UserDetails userDetails,
         @RequestParam @Valid @NotNull(message = "Nickname cannot be null") String nickname,
         @RequestParam("image") MultipartFile image
     ) {
-
         profileService.saveUserProfile(userDetails.getUsername(), nickname, image);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/users/profile/get")
+    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        ProfileResponseDto userProfile = profileService.getUserProfile(userDetails.getUsername());
+        return ResponseEntity.ok(userProfile);
+    }
+
+    @PostMapping("/users/profile/update")
+    public ResponseEntity<?> updateUserProfile(
+        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestParam @Valid @NotNull(message = "Nickname cannot be null") String nickname,
+        @RequestParam("image") MultipartFile image
+    ) {
+        profileService.updateUserProfile(userDetails.getUsername(), nickname, image);
         return ResponseEntity.ok().build();
     }
 
