@@ -94,7 +94,7 @@ public class TokenProvider {
             .compact();
 
         return ResponseCookie.from("JWT_TOKEN", token)
-            .httpOnly(true)
+            .httpOnly(false)
             .secure(false) // HTTPS를 사용하는 경우에만 true로 설정
             .path("/")
             .maxAge(ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS / 1000) // 초 단위로 변환
