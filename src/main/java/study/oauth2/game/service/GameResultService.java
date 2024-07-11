@@ -1,5 +1,9 @@
 package study.oauth2.game.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.game.domain.dto.GameResultRequestDto;
 import study.oauth2.game.domain.dto.GameResultResponseDto;
+import study.oauth2.game.domain.dto.RecentResultDto;
+import study.oauth2.game.domain.dto.ResultPagingDto;
 import study.oauth2.game.domain.entity.GameResult;
 import study.oauth2.game.domain.entity.Highlight;
 import study.oauth2.game.repository.GameResultRepository;
@@ -39,5 +45,22 @@ public class GameResultService {
 		gameResultRepository.save(gameResult);
 		// TODO: Highlight 좌표 결과 객체 -> JSON 문자열로 변환하여 저장
 		return GameResultResponseDto.of(gameResult.getTotalDamage(), gameResult.getHighlight().getId());
+	}
+
+	public Page<RecentResultDto> getGameResult(String userEmail, ResultPagingDto resultPagingDto) {
+		Pageable pageable = PageRequest.of(resultPagingDto.getPage(), resultPagingDto.getSize(),
+			Sort.by(convertToSortDirection(resultPagingDto.getSort()), resultPagingDto.getSortField()));
+		Page<GameResult> gameResults = gameResultRepository.findAllGameResultPage(userEmail, pageable, resultPagingDto);
+		return gameResults.map(RecentResultDto::toDto);
+	}
+
+	private Sort.Direction convertToSortDirection(String sort) {
+		if (sort.equalsIgnoreCase("ASC")) {
+			return Sort.Direction.ASC;
+		} else if (sort.equalsIgnoreCase("DESC")) {
+			return Sort.Direction.DESC;
+		} else {
+			throw new IllegalArgumentException("Invalid sort direction: " + sort);
+		}
 	}
 }
