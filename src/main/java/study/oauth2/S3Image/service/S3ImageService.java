@@ -111,4 +111,11 @@ public class S3ImageService {
 			throw new S3Exception(ErrorCode.IO_EXCEPTION_ON_IMAGE_DELETE);
 		}
 	}
+
+	public String update(String oldImageUrl, MultipartFile newImage) {
+		if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+			deleteImageFromS3(oldImageUrl);
+		}
+		return upload(newImage);
+	}
 }

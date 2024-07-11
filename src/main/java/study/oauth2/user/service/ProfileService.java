@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.S3Image.service.S3ImageService;
 import study.oauth2.user.domain.dto.ProfileDto;
+import study.oauth2.user.domain.dto.ProfileResponseDto;
 import study.oauth2.user.domain.entity.Profile;
 import study.oauth2.user.domain.entity.User;
 import study.oauth2.user.repository.ProfileRepository;
@@ -24,7 +25,6 @@ public class ProfileService {
 	private final UserRepository userRepository;
 	private final S3ImageService s3ImageService;
 
-	// OneToOne 조인 시 N + 1 문제를 해결하기 위해 양방향 매핑이 아닌 Id로 매핑
 	@Transactional
 	public void saveUserProfile(String email, String nickname, MultipartFile profileImage) {
 		User user = userRepository.findByEmail(email)
@@ -38,4 +38,21 @@ public class ProfileService {
 		user.setProfile(profile);
 	}
 
+	@Transactional
+	public void updateUserProfile(String email, String nickname, MultipartFile profileImage) {
+		User user = userRepository.findByEmailWithProfile(email)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		String updateImage = s3ImageService.update(user.getProfile().getProfileImage(), profileImage);
+		user.getProfile().update(nickname, updateImage);
+
+	}
+
+	public ProfileResponseDto getUserProfile(String userEmail) {
+		User user = userRepository.findByEmailWithProfile(userEmail)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		if (user.getProfile() == null) {
+			throw new UsernameNotFoundException("Profile not found");
+		}
+		return ProfileResponseDto.of(user.getProfile().getNickname(), user.getProfile().getProfileImage());
+	}
 }
