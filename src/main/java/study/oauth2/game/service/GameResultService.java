@@ -2,11 +2,17 @@ package study.oauth2.game.service;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.game.domain.dto.GameResultRequestDto;
+import study.oauth2.game.domain.dto.GameResultResponseDto;
 import study.oauth2.game.domain.entity.GameResult;
+import study.oauth2.game.domain.entity.Highlight;
 import study.oauth2.game.repository.GameResultRepository;
+import study.oauth2.game.repository.HighlightRepository;
 import study.oauth2.user.domain.entity.User;
 import study.oauth2.user.repository.UserRepository;
 
@@ -16,26 +22,22 @@ import study.oauth2.user.repository.UserRepository;
 public class GameResultService {
 
 	private final GameResultRepository gameResultRepository;
+	private final HighlightRepository highlightRepository;
 	private final UserRepository userRepository;
+	private final ObjectMapper objectMapper;
 
-	// TODO: 게임 결과 저장
-	public void saveGameResult(String userEmail, GameResultRequestDto gameResultRequestDto) {
-		log.info("saveGameResult userEmail: {}", userEmail);
+	public GameResultResponseDto saveGameResult(String userEmail, GameResultRequestDto gameResultRequestDto) throws
+		JsonProcessingException {
+
 		User user = userRepository.findByEmailWithProfileDefault(userEmail);
-
 		User opponent = userRepository.findByEmailWithProfileDefault(gameResultRequestDto.getOpponentEmail());
+		GameResult gameResult = GameResultRequestDto.toGameResultEntity(user, opponent, gameResultRequestDto);
 
-		GameResult gameResult = GameResultRequestDto.toEntity(user, opponent, gameResultRequestDto);
-		gameResult.setUser(user);
+		Highlight highlight = GameResultRequestDto.toHighlightEntity(gameResultRequestDto, objectMapper);
+		highlightRepository.save(highlight);
+		gameResult.setting(user, highlight);
 		gameResultRepository.save(gameResult);
+		// TODO: Highlight 좌표 결과 객체 -> JSON 문자열로 변환하여 저장
+		return GameResultResponseDto.of(gameResult.getTotalDamage(), gameResult.getHighlight().getId());
 	}
-
-	// public void setCoordinates(List<Coordinate> coordinates) throws JsonProcessingException {
-	// 	this.coordinates = mapper.writeValueAsString(coordinates);
-	// }
-	//
-	// // JSON 문자열을 좌표 데이터로 반환
-	// public List<Coordinate> getCoordinates() throws JsonProcessingException {
-	// 	return mapper.readValue(this.coordinates, new TypeReference<List<Coordinate>>() {});
-	// }
 }
