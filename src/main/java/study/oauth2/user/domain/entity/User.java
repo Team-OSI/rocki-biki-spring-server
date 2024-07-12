@@ -60,6 +60,7 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "profile_id")
 	private Profile profile;
 
+	@Builder.Default
 	@OneToMany(mappedBy = "user")
 	private List<GameResult> gameResults = new ArrayList<>();
 
