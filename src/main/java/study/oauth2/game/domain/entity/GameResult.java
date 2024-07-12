@@ -39,7 +39,7 @@ public class GameResult extends BaseEntity {
 	private String userEmail;
 	private String opponentEmail;
 
-	private String winner;
+	private Boolean win;
 	private Long totalDamage;
 
 	private String opponentProfileImage;

@@ -47,10 +47,10 @@ public class GameResultService {
 		return GameResultResponseDto.of(gameResult.getTotalDamage(), gameResult.getHighlight().getId());
 	}
 
-	public Page<RecentResultDto> getGameResult(String userEmail, ResultPagingDto resultPagingDto) {
+	public Page<RecentResultDto> getGameResult(ResultPagingDto resultPagingDto) {
 		Pageable pageable = PageRequest.of(resultPagingDto.getPage(), resultPagingDto.getSize(),
 			Sort.by(convertToSortDirection(resultPagingDto.getSort()), resultPagingDto.getSortField()));
-		Page<GameResult> gameResults = gameResultRepository.findAllGameResultPage(userEmail, pageable, resultPagingDto);
+		Page<GameResult> gameResults = gameResultRepository.findAllGameResultPage(pageable, resultPagingDto);
 		return gameResults.map(RecentResultDto::toDto);
 	}
 

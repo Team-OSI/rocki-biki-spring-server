@@ -23,18 +23,17 @@ public class GameResultRequestDto {
 	private String opponentEmail;
 	private Long totalDamage;
 
-	private String winner;
+	private Boolean win;
 	private CoordinateDto coordinates;
 
 	public static GameResult toGameResultEntity(User user, User opponent, GameResultRequestDto requestDto) {
-		String winner = user.getEmail().equals(requestDto.getWinner()) ? user.getProfile().getNickname() : opponent.getProfile().getNickname();
 		return GameResult.builder()
 			.opponentId(opponent.getId())
 			.userEmail(user.getEmail())
 			.opponentEmail(opponent.getEmail())
 			.userName(user.getProfile().getNickname())
 			.opponentName(opponent.getProfile().getNickname())
-			.winner(winner)
+			.win(requestDto.getWin())
 			.totalDamage(requestDto.getTotalDamage())
 			.build();
 	}

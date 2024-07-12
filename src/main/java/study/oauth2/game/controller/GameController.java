@@ -49,10 +49,9 @@ public class GameController {
 
 	@PostMapping("/recent-result")
 	public ResponseEntity<?> getGameResult(
-		@AuthenticationPrincipal UserDetails userDetails,
 		@Valid @RequestBody ResultPagingDto postPagingDto
 	) {
-		Page<RecentResultDto> page = gameResultService.getGameResult(userDetails.getUsername(), postPagingDto);
+		Page<RecentResultDto> page = gameResultService.getGameResult(postPagingDto);
 		return ResponseEntity.ok(page);
 	}
 }

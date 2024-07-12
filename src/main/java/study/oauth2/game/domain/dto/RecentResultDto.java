@@ -16,7 +16,7 @@ public class RecentResultDto {
 	private String userEmail;
 	private String opponentEmail;
 
-	private String winner;
+	private Boolean win;
 	private Long totalDamage;
 
 	private String opponentProfileImage;
@@ -28,7 +28,7 @@ public class RecentResultDto {
 			.opponentName(gameResult.getOpponentName())
 			.userEmail(gameResult.getUserEmail())
 			.opponentEmail(gameResult.getOpponentEmail())
-			.winner(gameResult.getWinner())
+			.win(gameResult.getWin())
 			.totalDamage(gameResult.getTotalDamage())
 			.opponentProfileImage(gameResult.getOpponentProfileImage())
 			.highlightId(gameResult.getHighlight().getId())
