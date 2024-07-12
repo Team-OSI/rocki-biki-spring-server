@@ -18,8 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.auth.local.jwt.TokenProvider;
-import study.oauth2.auth.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import study.oauth2.auth.oauth2.service.OAuth2UserPrincipal;
+import study.oauth2.auth.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import study.oauth2.auth.oauth2.user.OAuth2Provider;
 import study.oauth2.auth.oauth2.user.OAuth2UserUnlinkManager;
 import study.oauth2.auth.oauth2.util.CookieUtils;
@@ -39,15 +39,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
 
-        try {
-            ResponseCookie accessTokenCookie = tokenProvider.createToken(authentication);
-            response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-            log.info("Access token cookie added to response: {}", accessTokenCookie.toString());
-        } catch (Exception e) {
-            log.error("Error while creating or setting access token cookie", e);
-        }
+        String targetUrl;
 
-        String targetUrl = determineTargetUrl(request, response, authentication);
+        targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
             logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
@@ -60,35 +54,64 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
+
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
             .map(Cookie::getValue);
+
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
+
         String mode = CookieUtils.getCookie(request, MODE_PARAM_COOKIE_NAME)
             .map(Cookie::getValue)
             .orElse("");
+
         OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
+
         if (principal == null) {
             return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("error", "Login failed")
                 .build().toUriString();
         }
+
         if ("login".equalsIgnoreCase(mode)) {
             userService.findOrCreateUser(principal.getUserInfo().getEmail(), principal.getUserInfo().getProvider());
+            // TODO: 액세스 토큰, 리프레시 토큰 발급
+            // TODO: 리프레시 토큰 DB 저장
             log.info("email={}, name={}, nickname={}, accessToken={}", principal.getUserInfo().getEmail(),
                 principal.getUserInfo().getName(),
                 principal.getUserInfo().getNickname(),
                 principal.getUserInfo().getAccessToken()
             );
-            return targetUrl; // URL 파라미터 없이 targetUrl만 반환
+
+            ResponseCookie accessTokenCookie = tokenProvider.createToken(authentication);
+            // ResponseCookie refreshTokenCookie = tokenProvider.createRefreshToken(authentication);
+            String accessToken = accessTokenCookie.getValue();
+            // String refreshToken = refreshTokenCookie.getValue();
+            String refreshToken = "refreshToken";
+
+            response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshToken);
+
+            return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("access_token", accessToken)
+                .queryParam("refresh_token", refreshToken)
+                .build().toUriString();
+
         } else if ("unlink".equalsIgnoreCase(mode)) {
+
             String accessToken = principal.getUserInfo().getAccessToken();
             OAuth2Provider provider = principal.getUserInfo().getProvider();
+
             // TODO: DB 삭제
             // TODO: 리프레시 토큰 삭제
             oAuth2UserUnlinkManager.unlink(provider, accessToken);
-            return targetUrl; // URL 파라미터 없이 targetUrl만 반환
+
+            return UriComponentsBuilder.fromUriString(targetUrl)
+                .build().toUriString();
         }
-        return targetUrl; // 기본적으로 targetUrl 반환
+
+        return UriComponentsBuilder.fromUriString(targetUrl)
+            .queryParam("error", "Login failed")
+            .build().toUriString();
     }
 
     private OAuth2UserPrincipal getOAuth2UserPrincipal(Authentication authentication) {

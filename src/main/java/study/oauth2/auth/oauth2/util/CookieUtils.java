@@ -8,20 +8,27 @@ import org.springframework.util.SerializationUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CookieUtils {
 
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
+        log.info("Looking for cookie: {}", name);
         if (cookies != null) {
             for (Cookie cookie : cookies) {
+                log.info("Found cookie: {} = {}", cookie.getName(), cookie.getValue());
                 if (cookie.getName().equals(name)) {
+                    log.info("Matching cookie found: {} = {}", name, cookie.getValue());
                     return Optional.of(cookie);
                 }
             }
         }
+        log.info("Cookie {} not found", name);
         return Optional.empty();
     }
+
 
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
