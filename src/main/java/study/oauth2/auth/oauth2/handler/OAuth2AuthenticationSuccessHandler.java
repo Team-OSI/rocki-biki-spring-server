@@ -39,9 +39,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
 
-        String targetUrl;
+        try {
+            ResponseCookie accessTokenCookie = tokenProvider.createToken(authentication);
+            response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+            log.info("Access token cookie added to response: {}", accessTokenCookie.toString());
+        } catch (Exception e) {
+            log.error("Error while creating or setting access token cookie", e);
+        }
 
-        targetUrl = determineTargetUrl(request, response, authentication);
+        String targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
             logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
@@ -68,19 +74,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         if ("login".equalsIgnoreCase(mode)) {
             userService.findOrCreateUser(principal.getUserInfo().getEmail(), principal.getUserInfo().getProvider());
-            // TODO: 액세스 토큰, 리프레시 토큰 발급
-            // TODO: 리프레시 토큰 DB 저장
             log.info("email={}, name={}, nickname={}, accessToken={}", principal.getUserInfo().getEmail(),
                 principal.getUserInfo().getName(),
                 principal.getUserInfo().getNickname(),
                 principal.getUserInfo().getAccessToken()
             );
-            ResponseCookie accessTokenCookie = tokenProvider.createToken(authentication);
-            // ResponseCookie refreshTokenCookie = tokenProvider.createRefreshToken(authentication);
-            // String refreshToken = refreshTokenCookie.getValue();
-            String refreshToken = "refreshToken";
-            response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshToken);
             return targetUrl; // URL 파라미터 없이 targetUrl만 반환
         } else if ("unlink".equalsIgnoreCase(mode)) {
             String accessToken = principal.getUserInfo().getAccessToken();
