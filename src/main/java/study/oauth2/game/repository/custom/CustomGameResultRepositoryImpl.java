@@ -30,12 +30,12 @@ public class CustomGameResultRepositoryImpl implements CustomGameResultRepositor
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Page<GameResult> findAllGameResultPage(String userEmail, Pageable pageable, ResultPagingDto resultPagingDto) {
+	public Page<GameResult> findAllGameResultPage(Pageable pageable, ResultPagingDto resultPagingDto) {
 		List<GameResult> gameResults = queryFactory
 			.selectFrom(gameResult)
 			.leftJoin(gameResult.user, user)
 			.leftJoin(user.profile, profile)
-			.where(user.email.eq(userEmail))
+			.where(user.email.eq(resultPagingDto.getUserEmail()))
 			.orderBy(getOrderSpecifier(resultPagingDto))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -44,7 +44,7 @@ public class CustomGameResultRepositoryImpl implements CustomGameResultRepositor
 		JPAQuery<Long> countQuery = queryFactory
 			.select(gameResult.count())
 			.from(gameResult)
-			.where(user.email.eq(userEmail));
+			.where(user.email.eq(resultPagingDto.getUserEmail()));
 
 		return PageableExecutionUtils.getPage(gameResults, pageable, countQuery::fetchOne);
 

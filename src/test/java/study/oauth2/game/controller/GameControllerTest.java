@@ -55,7 +55,7 @@ class GameControllerTest {
 		gameResultRequestDto = new GameResultRequestDto(
 			"opponent@example.com",
 			1000L,
-			"user@example.com",
+			true,
 			new CoordinateDto(Collections.emptyList())
 		);
 	}
@@ -94,9 +94,9 @@ class GameControllerTest {
 	void getGameResult() throws Exception {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdDate").descending());
 		Page<RecentResultDto> page = new PageImpl<>(Collections.emptyList(), pageable, 0);
-		ResultPagingDto resultPagingDto = new ResultPagingDto(0, 10, "DESC", "createdDate");
+		ResultPagingDto resultPagingDto = new ResultPagingDto("user@example.com", 0, 10, "DESC", "createdDate");
 
-		when(gameResultService.getGameResult(eq("user@example.com"), any(ResultPagingDto.class)))
+		when(gameResultService.getGameResult(any(ResultPagingDto.class)))
 			.thenReturn(page);
 
 		mockMvc.perform(post("/api/game/recent-result")

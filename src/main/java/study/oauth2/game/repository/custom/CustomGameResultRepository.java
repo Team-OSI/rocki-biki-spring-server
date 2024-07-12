@@ -11,6 +11,6 @@ import study.oauth2.user.domain.dto.FollowSimpleDto;
 
 public interface CustomGameResultRepository {
 
-	Page<GameResult> findAllGameResultPage(String userEmail, Pageable pageable, ResultPagingDto resultPagingDto);
+	Page<GameResult> findAllGameResultPage(Pageable pageable, ResultPagingDto resultPagingDto);
 
 }

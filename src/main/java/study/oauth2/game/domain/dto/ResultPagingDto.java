@@ -14,6 +14,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResultPagingDto {
 
+	private String userEmail;
+
 	@Min(value = 0, message = "Page number must be zero or greater")
 	private int page;
 
