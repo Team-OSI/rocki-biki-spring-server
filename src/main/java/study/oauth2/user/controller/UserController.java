@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,8 +42,9 @@ public class UserController {
     public ResponseEntity<?> setUserProfile(
         @AuthenticationPrincipal UserDetails userDetails,
         @RequestParam @Valid @NotNull(message = "Nickname cannot be null") String nickname,
-        @RequestParam("image") MultipartFile image
+        @RequestPart(value = "image", required = false) MultipartFile image
     ) {
+        log.info("profile set request : {}", userDetails.getUsername());
         ProfileResponseDto profileResponseDto = profileService.saveUserProfile(userDetails.getUsername(), nickname, image);
         return ResponseEntity.ok(profileResponseDto);
     }
@@ -57,7 +59,7 @@ public class UserController {
     public ResponseEntity<?> updateUserProfile(
         @AuthenticationPrincipal UserDetails userDetails,
         @RequestParam @Valid @NotNull(message = "Nickname cannot be null") String nickname,
-        @RequestParam("image") MultipartFile image
+        @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         ProfileResponseDto profileResponseDto = profileService.updateUserProfile(userDetails.getUsername(), nickname, image);
         return ResponseEntity.ok(profileResponseDto);
@@ -66,7 +68,7 @@ public class UserController {
     @PostMapping("/profile/addSound")
     public ResponseEntity<?> addUserSound(
         @AuthenticationPrincipal UserDetails userDetails,
-        @RequestParam("sound") MultipartFile sound,
+        @RequestPart(value = "sound", required = false) MultipartFile sound,
         @RequestParam("old_url") String oldUrl
     ) {
         profileService.addUserSound(userDetails.getUsername(), sound, oldUrl);
