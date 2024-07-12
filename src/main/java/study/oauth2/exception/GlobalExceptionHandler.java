@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<String> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-		return handleException(ex, HttpStatus.NOT_FOUND);
+		return handleException(ex, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(JsonProcessingException.class)
