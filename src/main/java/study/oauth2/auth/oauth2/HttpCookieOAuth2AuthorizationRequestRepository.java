@@ -52,9 +52,15 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
         String mode = request.getParameter(MODE_PARAM_COOKIE_NAME);
         if (StringUtils.hasText(mode)) {
             CookieUtils.addCookie(response,
-                    MODE_PARAM_COOKIE_NAME,
-                    mode,
-                    COOKIE_EXPIRE_SECONDS);
+                MODE_PARAM_COOKIE_NAME,
+                mode,
+                COOKIE_EXPIRE_SECONDS);
+        } else {
+            // 만약 mode 파라미터가 없다면, 기본값으로 'login'을 설정
+            CookieUtils.addCookie(response,
+                MODE_PARAM_COOKIE_NAME,
+                "login",
+                COOKIE_EXPIRE_SECONDS);
         }
     }
 
