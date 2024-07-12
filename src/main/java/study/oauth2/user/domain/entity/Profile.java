@@ -38,6 +38,7 @@ public class Profile {
 	private String nickname;
 	private String profileImage;
 
+	@Getter
 	@ElementCollection
 	@CollectionTable(name = "user_sound_urls", joinColumns = @JoinColumn(name = "profile_id"))
 	@Column(name = "user_sound_urls")

@@ -48,7 +48,6 @@ public class ProfileService {
 		String updateImage = s3Service.update(user.getProfile().getProfileImage(), profileImage, FileType.IMAGE);
 		user.getProfile().update(nickname, updateImage);
 		return ProfileResponseDto.of(user.getProfile().getNickname(), user.getProfile().getProfileImage());
-
 	}
 
 	public ProfileResponseDto getUserProfile(String userEmail) {
@@ -64,11 +63,10 @@ public class ProfileService {
 	public void addUserSound(String email, MultipartFile sound, String oldUrl) {
 		User user = userRepository.findByEmailWithProfile(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-		String soundPath = null;
 		if (sound != null) {
-			soundPath = s3Service.update(oldUrl, sound, FileType.SOUND);
+			String soundPath = s3Service.update(oldUrl, sound, FileType.SOUND);
+			user.getProfile().addSoundUrl(soundPath);
 		}
-		user.getProfile().addSoundUrl(soundPath);
 	}
 
 	public UserInfoResponseDto getUserInfo(String email) {
