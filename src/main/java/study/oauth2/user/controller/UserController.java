@@ -1,10 +1,13 @@
 package study.oauth2.user.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +20,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import study.oauth2.user.domain.dto.AudioUploadDTO;
 import study.oauth2.user.domain.dto.FollowCountResponseDto;
 import study.oauth2.user.domain.dto.FollowRequestDto;
 import study.oauth2.user.domain.dto.ProfileResponseDto;
@@ -65,14 +69,30 @@ public class UserController {
         return ResponseEntity.ok(profileResponseDto);
     }
 
-    @PostMapping("/profile/addSound")
+    @PostMapping("/profile/sound")
     public ResponseEntity<?> addUserSound(
         @AuthenticationPrincipal UserDetails userDetails,
-        @RequestPart(value = "sound", required = false) MultipartFile sound,
-        @RequestParam("old_url") String oldUrl
+        @ModelAttribute AudioUploadDTO audioUploadDTO
     ) {
-        profileService.addUserSound(userDetails.getUsername(), sound, oldUrl);
+        profileService.addUserSound(userDetails.getUsername(), audioUploadDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/profile/sound")
+    public ResponseEntity<?> deleteUserSound(
+        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestParam("old_url") String url
+    ) {
+        profileService.deleteUserSound(userDetails.getUsername(), url);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/profile/sound")
+    public ResponseEntity<?> getUserSounds(
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        List<String> userSound = profileService.getUserSound(userDetails.getUsername());
+        return ResponseEntity.ok(userSound);
     }
 
     @PostMapping("/follow/add")
