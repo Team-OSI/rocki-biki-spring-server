@@ -69,7 +69,7 @@ public class S3Service {
 				allowedExtensionList = Arrays.asList("jpg", "jpeg", "png", "gif");
 				break;
 			case SOUND:
-				allowedExtensionList = Arrays.asList("mp3", "wav", "ogg");
+				allowedExtensionList = Arrays.asList("mp3", "wav", "ogg", "webm");
 				break;
 			default:
 				throw new S3Exception(ErrorCode.INVALID_FILE_TYPE);
@@ -107,8 +107,8 @@ public class S3Service {
 		return amazonS3.getUrl(bucketName, s3FileName).toString();
 	}
 
-	public void deleteImageFromS3(String imageAddress){
-		String key = getKeyFromImageAddress(imageAddress);
+	public void deleteImageFromS3(String address){
+		String key = getKeyFromImageAddress(address);
 		try{
 			amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
 		}catch (Exception e){
@@ -127,9 +127,7 @@ public class S3Service {
 	}
 
 	public String update(String oldFileUrl, MultipartFile newFile, FileType fileType) {
-		if (oldFileUrl != null && !oldFileUrl.isEmpty()) {
-			deleteImageFromS3(oldFileUrl);
-		}
+		deleteImageFromS3(oldFileUrl);
 		return upload(newFile, fileType);
 	}
 }

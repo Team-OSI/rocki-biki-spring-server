@@ -1,5 +1,8 @@
 package study.oauth2.user.service;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import study.oauth2.S3.service.S3Service;
+import study.oauth2.user.domain.dto.AudioUploadDTO;
 import study.oauth2.user.domain.dto.ProfileDto;
 import study.oauth2.user.domain.dto.ProfileResponseDto;
 import study.oauth2.user.domain.dto.UserInfoResponseDto;
@@ -60,13 +64,24 @@ public class ProfileService {
 	}
 
 	@Transactional
-	public void addUserSound(String email, MultipartFile sound, String oldUrl) {
+	public void addUserSound(String email, AudioUploadDTO audioUploadDTO) {
 		User user = userRepository.findByEmailWithProfile(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-		if (sound != null) {
-			String soundPath = s3Service.update(oldUrl, sound, FileType.SOUND);
-			user.getProfile().addSoundUrl(soundPath);
-		}
+		audioUploadDTO.getAudios().forEach(audio -> {
+			MultipartFile audioFile = (MultipartFile) audio.get(0);
+			String audioUrl = (String) audio.get(1);
+			if (audioFile != null) {
+				if (audioUrl.isEmpty()) {
+					log.info("=========upload=========");
+					String url = s3Service.upload(audioFile, FileType.SOUND);
+					user.getProfile().addSoundUrl(url);
+				} else if (user.getProfile().getUserSoundUrls().contains(audioUrl)) {
+					log.info("=========update=========");
+					String newUrl = s3Service.update(audioUrl, audioFile, FileType.SOUND);
+					user.getProfile().updateSoundUrl(audioUrl, newUrl);
+				}
+			}
+		});
 	}
 
 	public UserInfoResponseDto getUserInfo(String email) {
@@ -74,5 +89,33 @@ public class ProfileService {
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 		Profile profile = user.getProfile();
 		return UserInfoResponseDto.of(profile.getNickname(), profile.getProfileImage(), profile.getUserSoundUrls());
+	}
+
+	@Transactional
+	public void deleteUserSound(String email, String url) {
+		User user = userRepository.findByEmailWithProfile(email)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+		Profile profile = user.getProfile();
+		if (profile == null) {
+			throw new IllegalStateException("User profile not found");
+		}
+
+		List<String> soundUrls = profile.getUserSoundUrls();
+		if (soundUrls == null || !soundUrls.contains(url)) {
+			throw new IllegalArgumentException("Sound URL not found");
+		}
+
+		s3Service.deleteImageFromS3(url);
+	}
+
+	public List<String> getUserSound(String email) {
+		User user = userRepository.findByEmailWithProfile(email)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+		Profile profile = user.getProfile();
+		return profile.getUserSoundUrls();
+
+
 	}
 }

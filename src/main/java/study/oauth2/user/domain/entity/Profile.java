@@ -60,4 +60,13 @@ public class Profile {
 	public void addSoundUrl(String soundUrl) {
 		this.userSoundUrls.add(soundUrl);
 	}
+
+	public void deleteSoundUrl(String soundUrl) {
+		this.userSoundUrls.remove(soundUrl);
+	}
+
+	public void updateSoundUrl(String oldUrl, String soundUrl) {
+		this.userSoundUrls.remove(oldUrl);
+		this.userSoundUrls.add(soundUrl);
+	}
 }
