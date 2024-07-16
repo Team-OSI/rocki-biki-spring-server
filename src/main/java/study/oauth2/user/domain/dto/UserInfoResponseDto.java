@@ -1,6 +1,5 @@
 package study.oauth2.user.domain.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Builder;
