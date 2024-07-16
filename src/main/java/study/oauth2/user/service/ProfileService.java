@@ -52,6 +52,9 @@ public class ProfileService {
 	public ProfileResponseDto updateUserProfile(String email, String nickname, MultipartFile profileImage) {
 		User user = userRepository.findByEmailWithProfile(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		if (!user.getProfile().getNickname().equals(nickname) && profileRepository.existsByNickname(nickname)) {
+			throw new IllegalArgumentException("Nickname already exists");
+		}
 		String updateImage = s3Service.update(user.getProfile().getProfileImage(), profileImage, FileType.IMAGE);
 		user.getProfile().update(nickname, updateImage);
 		return ProfileResponseDto.of(user.getProfile().getNickname(), user.getProfile().getProfileImage());
