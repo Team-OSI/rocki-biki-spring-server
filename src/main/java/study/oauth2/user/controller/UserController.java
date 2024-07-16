@@ -37,7 +37,7 @@ public class UserController {
     private final ProfileService profileService;
     private final FollowService followService;
 
-    @GetMapping
+    @GetMapping("/getUserInfo")
     public String getUserInfo(@AuthenticationPrincipal UserDetails UserDetails) {
         return UserDetails.getUsername();
     }
@@ -54,8 +54,8 @@ public class UserController {
     }
 
     @GetMapping("/profile/get")
-    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
-        ProfileResponseDto userProfile = profileService.getUserProfile(userDetails.getUsername());
+    public ResponseEntity<?> getUserProfile(@RequestParam("userEmail") String userEmail) {
+        ProfileResponseDto userProfile = profileService.getUserProfile(userEmail);
         return ResponseEntity.ok(userProfile);
     }
 

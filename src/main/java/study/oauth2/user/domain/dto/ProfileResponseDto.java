@@ -9,6 +9,7 @@ import lombok.Setter;
 @Builder
 public class ProfileResponseDto {
 
+	private String userEmail;
 	private String nickname;
 	private String profileImage;
 
