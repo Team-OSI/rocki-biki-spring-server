@@ -1,6 +1,6 @@
 package study.oauth2.user.service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,8 +18,10 @@ import study.oauth2.user.domain.dto.UserInfoResponseDto;
 import study.oauth2.user.domain.entity.FileType;
 import study.oauth2.user.domain.entity.Profile;
 import study.oauth2.user.domain.entity.User;
+import study.oauth2.user.domain.entity.UserSoundUrl;
 import study.oauth2.user.repository.ProfileRepository;
 import study.oauth2.user.repository.UserRepository;
+import study.oauth2.user.repository.UserSoundUrlRepository;
 
 @Slf4j
 @Service
@@ -30,6 +32,7 @@ public class ProfileService {
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
 	private final S3Service s3Service;
+	private final UserSoundUrlRepository userSoundUrlRepository;
 
 	@Transactional
 	public ProfileResponseDto saveUserProfile(String email, String nickname, MultipartFile profileImage) {
@@ -67,18 +70,20 @@ public class ProfileService {
 	public void addUserSound(String email, AudioUploadDTO audioUploadDTO) {
 		User user = userRepository.findByEmailWithProfile(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-		audioUploadDTO.getAudios().forEach(audio -> {
+		Profile profile = user.getProfile();
+		List<List<Object>> audios = audioUploadDTO.getAudios();
+		audios.forEach(audio -> {
 			MultipartFile audioFile = (MultipartFile) audio.get(0);
 			String audioUrl = (String) audio.get(1);
+
 			if (audioFile != null) {
+				List<String> userSoundUrlList = toList(profile.getUserSoundUrls());
 				if (audioUrl.isEmpty()) {
-					log.info("=========upload=========");
 					String url = s3Service.upload(audioFile, FileType.SOUND);
-					user.getProfile().addSoundUrl(url);
-				} else if (user.getProfile().getUserSoundUrls().contains(audioUrl)) {
-					log.info("=========update=========");
+					userSoundUrlRepository.save(profile.addSoundUrl(url));
+				} else if (userSoundUrlList.contains(audioUrl)) {
 					String newUrl = s3Service.update(audioUrl, audioFile, FileType.SOUND);
-					user.getProfile().updateSoundUrl(audioUrl, newUrl);
+					profile.updateSoundUrl(audioUrl, newUrl);
 				}
 			}
 		});
@@ -88,7 +93,7 @@ public class ProfileService {
 		User user = userRepository.findByEmailWithProfile(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 		Profile profile = user.getProfile();
-		return UserInfoResponseDto.of(profile.getNickname(), profile.getProfileImage(), profile.getUserSoundUrls());
+		return UserInfoResponseDto.of(profile.getNickname(), profile.getProfileImage(), toList(profile.getUserSoundUrls()));
 	}
 
 	@Transactional
@@ -101,8 +106,8 @@ public class ProfileService {
 			throw new IllegalStateException("User profile not found");
 		}
 
-		List<String> soundUrls = profile.getUserSoundUrls();
-		if (soundUrls == null || !soundUrls.contains(url)) {
+		List<String> soundUrls = toList(profile.getUserSoundUrls());
+		if (!soundUrls.contains(url)) {
 			throw new IllegalArgumentException("Sound URL not found");
 		}
 
@@ -114,8 +119,12 @@ public class ProfileService {
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 		Profile profile = user.getProfile();
-		return profile.getUserSoundUrls();
+		return toList(profile.getUserSoundUrls());
+	}
 
-
+	private List<String> toList(List<UserSoundUrl> userSoundUrls) {
+		List<String> soundUrls = new ArrayList<>();
+		userSoundUrls.forEach(userSoundUrl -> soundUrls.add(userSoundUrl.getUrl()));
+		return soundUrls;
 	}
 }
