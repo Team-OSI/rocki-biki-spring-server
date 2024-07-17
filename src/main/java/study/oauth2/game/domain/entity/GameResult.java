@@ -1,7 +1,5 @@
 package study.oauth2.game.domain.entity;
 
-import net.minidev.json.annotate.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.oauth2.config.BaseEntity;
-import study.oauth2.user.domain.entity.User;
+import study.oauth2.user.domain.entity.Profile;
 
 @Getter
 @Entity
@@ -31,10 +29,14 @@ public class GameResult extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Long opponentId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "profile_id")
+	private Profile myProfile;
 
-	private String userName;
-	private String opponentName;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "opponent_profile_id")
+	private Profile opponentProfile;
+
 
 	private String userEmail;
 	private String opponentEmail;
@@ -42,20 +44,4 @@ public class GameResult extends BaseEntity {
 	private Boolean win;
 	private Long totalDamage;
 
-	private String opponentProfileImage;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "highlight_id")
-	private Highlight highlight;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JsonIgnore
-	@JoinColumn(name = "user_id", updatable = false)
-	private User user;
-
-	public void setting(User user, Highlight highlight) {
-		this.user = user;
-		user.getGameResults().add(this);
-		this.highlight = highlight;
-	}
 }

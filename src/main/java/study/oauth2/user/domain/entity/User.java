@@ -60,10 +60,6 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "profile_id")
 	private Profile profile;
 
-	@Builder.Default
-	@OneToMany(mappedBy = "user")
-	private List<GameResult> gameResults = new ArrayList<>();
-
 	public static User create(String email, Auth auth, OAuth2Provider provider) {
 		if (provider == OAuth2Provider.LOCAL) {
 			return User.builder()

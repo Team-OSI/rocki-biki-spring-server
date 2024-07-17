@@ -16,22 +16,23 @@ public class RecentResultDto {
 	private String userEmail;
 	private String opponentEmail;
 
-	private Boolean win;
-	private Long totalDamage;
-
+	private String userProfileImage;
 	private String opponentProfileImage;
-	private Long highlightId;
+
+	private Boolean win;
+	// private Long totalDamage;
 
 	public static RecentResultDto toDto(GameResult gameResult) {
 		return RecentResultDto.builder()
-			.userName(gameResult.getUserName())
-			.opponentName(gameResult.getOpponentName())
+			.userName(gameResult.getMyProfile().getNickname())
+			.opponentName(gameResult.getOpponentProfile().getNickname())
 			.userEmail(gameResult.getUserEmail())
 			.opponentEmail(gameResult.getOpponentEmail())
 			.win(gameResult.getWin())
-			.totalDamage(gameResult.getTotalDamage())
-			.opponentProfileImage(gameResult.getOpponentProfileImage())
-			.highlightId(gameResult.getHighlight().getId())
+			.userProfileImage(gameResult.getMyProfile().getProfileImage())
+			.opponentProfileImage(gameResult.getOpponentProfile().getProfileImage())
+			// .totalDamage(gameResult.getTotalDamage())
+			// .highlightId(gameResult.getHighlight().getId())
 			.build();
 	}
 }
