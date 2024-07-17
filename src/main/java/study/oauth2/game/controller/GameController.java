@@ -17,7 +17,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import study.oauth2.game.domain.dto.CoordinateDto;
 import study.oauth2.game.domain.dto.GameResultRequestDto;
-import study.oauth2.game.domain.dto.GameResultResponseDto;
 import study.oauth2.game.domain.dto.RecentResultDto;
 import study.oauth2.game.domain.dto.ResultPagingDto;
 import study.oauth2.game.service.GameResultService;
@@ -36,8 +35,9 @@ public class GameController {
 		@AuthenticationPrincipal UserDetails userDetails,
 		@RequestBody @Valid GameResultRequestDto gameResultRequestDto
 	) throws JsonProcessingException {
-		GameResultResponseDto gameResultResponseDto = gameResultService.saveGameResult(userDetails.getUsername(), gameResultRequestDto);
-		return ResponseEntity.ok(gameResultResponseDto);
+		RecentResultDto recentResultDto = gameResultService.saveGameResult(userDetails.getUsername(),
+			gameResultRequestDto);
+		return ResponseEntity.ok(recentResultDto);
 	}
 
 	@GetMapping("/highlight")
