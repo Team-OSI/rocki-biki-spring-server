@@ -78,6 +78,15 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/profile/opponent/sound")
+    public ResponseEntity<?> getUserSound(
+        @RequestParam("email") String email
+    ) {
+        log.info("======================");
+        List<String> userSound = profileService.getUserSound(email);
+        return ResponseEntity.ok(userSound);
+    }
+
     @DeleteMapping("/profile/sound")
     public ResponseEntity<?> deleteUserSound(
         @AuthenticationPrincipal UserDetails userDetails,
