@@ -66,7 +66,7 @@ public class S3Service {
 
 		switch (fileType) {
 			case IMAGE:
-				allowedExtensionList = Arrays.asList("jpg", "jpeg", "png", "gif");
+				allowedExtensionList = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
 				break;
 			case SOUND:
 				allowedExtensionList = Arrays.asList("mp3", "wav", "ogg", "webm");

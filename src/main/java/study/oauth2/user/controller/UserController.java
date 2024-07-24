@@ -48,7 +48,6 @@ public class UserController {
         @RequestParam @Valid @NotNull(message = "Nickname cannot be null") String nickname,
         @RequestPart(value = "image", required = false) MultipartFile image
     ) {
-        log.info("profile set request : {}", userDetails.getUsername());
         ProfileResponseDto profileResponseDto = profileService.saveUserProfile(userDetails.getUsername(), nickname, image);
         return ResponseEntity.ok(profileResponseDto);
     }
@@ -82,7 +81,6 @@ public class UserController {
     public ResponseEntity<?> getUserSound(
         @RequestParam("email") String email
     ) {
-        log.info("======================");
         List<String> userSound = profileService.getUserSound(email);
         return ResponseEntity.ok(userSound);
     }
