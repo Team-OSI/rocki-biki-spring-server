@@ -1,10 +1,12 @@
 package study.oauth2.game.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,7 @@ import study.oauth2.game.domain.dto.CoordinateDto;
 import study.oauth2.game.domain.dto.GameResultRequestDto;
 import study.oauth2.game.domain.dto.RecentResultDto;
 import study.oauth2.game.domain.dto.ResultPagingDto;
+import study.oauth2.game.domain.dto.TotalResultDto;
 import study.oauth2.game.service.GameResultService;
 import study.oauth2.game.service.HighlightService;
 
@@ -53,5 +56,13 @@ public class GameController {
 	) {
 		Page<RecentResultDto> page = gameResultService.getGameResult(postPagingDto);
 		return ResponseEntity.ok(page);
+	}
+
+	@GetMapping("/recent-result/count")
+	public ResponseEntity<?> countGameResult(
+		@Param("userEmail") String userEmail
+	) {
+		TotalResultDto totalResultDto = gameResultService.countGameResult(userEmail);
+		return ResponseEntity.ok(totalResultDto);
 	}
 }
