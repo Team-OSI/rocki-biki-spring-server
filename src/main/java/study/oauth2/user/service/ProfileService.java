@@ -55,7 +55,10 @@ public class ProfileService {
 		if (!user.getProfile().getNickname().equals(nickname) && profileRepository.existsByNickname(nickname)) {
 			throw new IllegalArgumentException("Nickname already exists");
 		}
-		String updateImage = s3Service.update(user.getProfile().getProfileImage(), profileImage, FileType.IMAGE);
+		String updateImage = user.getProfile().getProfileImage();
+		if (!profileImage.isEmpty()) {
+			updateImage = s3Service.update(user.getProfile().getProfileImage(), profileImage, FileType.IMAGE);
+		}
 		user.getProfile().update(nickname, updateImage);
 		return ProfileResponseDto.of(user.getProfile().getNickname(), user.getProfile().getProfileImage());
 	}
