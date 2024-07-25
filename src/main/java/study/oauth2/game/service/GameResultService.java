@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import study.oauth2.game.domain.dto.GameResultRequestDto;
 import study.oauth2.game.domain.dto.RecentResultDto;
 import study.oauth2.game.domain.dto.ResultPagingDto;
+import study.oauth2.game.domain.dto.TotalResultDto;
 import study.oauth2.game.domain.entity.GameResult;
 import study.oauth2.game.repository.GameResultRepository;
 import study.oauth2.game.repository.HighlightRepository;
@@ -60,5 +61,11 @@ public class GameResultService {
 		} else {
 			throw new IllegalArgumentException("Invalid sort direction: " + sort);
 		}
+	}
+
+	public TotalResultDto countGameResult(String userEmail) {
+		Long totalWin = gameResultRepository.countWinByUserEmail(userEmail);
+		Long totalLose = gameResultRepository.countLoseByUserEmail(userEmail);
+		return TotalResultDto.create(totalWin, totalLose);
 	}
 }
